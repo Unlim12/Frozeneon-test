@@ -4,9 +4,16 @@ import ProductItem from './ProductItem.vue';
 import SearchBar from './SearchBar.vue';
 import { useProducts } from '@/composables/useProducts';
 
-const { products, fetchProducts, isLoading } = useProducts();
+const { products, fetchProducts, isLoading }: {
+  products: Ref<Product[]>;
+  fetchProducts: () => void;
+  isLoading: Ref<boolean>;
+} = useProducts();
+
 const searchQuery = ref('');
+
 const loadMoreTrigger = ref<HTMLElement | null>(null);
+
 const viewMode = ref<'grid' | 'list'>('grid');
 
 const filteredProducts = computed(() =>
@@ -16,7 +23,7 @@ const filteredProducts = computed(() =>
 );
 
 const observer = new IntersectionObserver(
-    (entries) => {
+    (entries: IntersectionObserverEntry[]) => {
       if (entries[0].isIntersecting && !isLoading.value) {
         fetchProducts();
       }
@@ -37,10 +44,10 @@ const toggleViewMode = () => {
 };
 </script>
 
+
 <template>
   <SearchBar @update:search="searchQuery = $event" />
 
-  <!-- Кнопка переключения режима -->
   <button @click="toggleViewMode" class="toggle-view-btn">
     {{ viewMode === 'grid' ? 'Список' : 'Сетка' }}
   </button>
@@ -80,7 +87,7 @@ const toggleViewMode = () => {
 .product-container.grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 20px;
+  gap: 0 20px;
 }
 
 .product-container.list {

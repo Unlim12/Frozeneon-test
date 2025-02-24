@@ -1,20 +1,29 @@
 import { ref, onMounted } from 'vue';
 import type { Product } from '@/types/types';
 
+interface ApiResponse {
+    products: Product[];
+}
+
 export function useProducts() {
     const products = ref<Product[]>([]);
     const limit = 20;
-    let offset = 0; // Сколько товаров уже загружено
-    const isLoading = ref(false); // Флаг загрузки
+    let offset: number = 0;
+    const isLoading = ref(false);
 
     async function fetchProducts(reset = false) {
         try {
             isLoading.value = true;
 
             const res = await fetch(`https://dummyjson.com/products?limit=${limit}&skip=${offset}`);
-            const data = await res.json();
+            const data: ApiResponse = await res.json();
 
-            products.value = [...products.value, ...data.products];
+
+            if (reset) {
+                products.value = data.products;
+            } else {
+                products.value = [...products.value, ...data.products];
+            }
             offset += limit;
 
         } catch (error) {
