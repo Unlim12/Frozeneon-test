@@ -26,6 +26,21 @@
     <div class="product-warranty">
       <span><strong>Гарантия:</strong> {{ product.warrantyInformation }}</span>
     </div>
+
+    <div v-if="0">
+      <div class="product-images">
+        <h4>Доп. фото:</h4>
+        <img v-for="(image, index) in product.images" :key="index" :src="image" alt="Product image">
+      </div>
+
+      <div class="product-reviews">
+        <h4>Отзывы:</h4>
+        <div v-for="(review, index) in product.reviews" :key="index" class="review">
+          <p><strong>{{ review.reviewerName }}:</strong> "{{ review.comment }}"</p>
+          <span>⭐ {{ review.rating }}/5</span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -62,6 +77,7 @@ defineProps<{ product: Product }>();
 }
 
 .product-title {
+  text-align: center;
   font-size: 1.2em;
   font-weight: bold;
   color: #333;
@@ -69,6 +85,8 @@ defineProps<{ product: Product }>();
 }
 
 .product-description {
+  width: 100%;
+  text-align: center;
   font-size: 0.95em;
   color: #666;
   line-height: 1.6;
@@ -118,7 +136,8 @@ defineProps<{ product: Product }>();
 }
 
 .product-card .product-rating {
-  margin-top: 15px;
+  margin-top: 5px;
+  margin-bottom: 5px;
   font-weight: bold;
 }
 

@@ -1,52 +1,27 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
 import ProductItem from './ProductItem.vue';
 import SearchBar from './SearchBar.vue';
-import { useProducts } from '@/composables/useProducts';
+import { useProductList } from '@/composables/useProductList';
 
-const { products, fetchProducts, isLoading }: {
-  products: Ref<Product[]>;
-  fetchProducts: () => void;
-  isLoading: Ref<boolean>;
-} = useProducts();
-
-const searchQuery = ref('');
-
-const loadMoreTrigger = ref<HTMLElement | null>(null);
-
-const viewMode = ref<'grid' | 'list'>('grid');
-
-const filteredProducts = computed(() =>
-    products.value.filter((product) =>
-        product.title.toLowerCase().includes(searchQuery.value.toLowerCase())
-    )
-);
-
-const observer = new IntersectionObserver(
-    (entries: IntersectionObserverEntry[]) => {
-      if (entries[0].isIntersecting && !isLoading.value) {
-        fetchProducts();
-      }
-    },
-    { rootMargin: '100px' }
-);
-
-onMounted(() => {
-  if (loadMoreTrigger.value) observer.observe(loadMoreTrigger.value);
-});
-
-onUnmounted(() => {
-  if (loadMoreTrigger.value) observer.unobserve(loadMoreTrigger.value);
-});
-
-const toggleViewMode = () => {
-  viewMode.value = viewMode.value === 'grid' ? 'list' : 'grid';
-};
+const {
+  products,
+  filteredProducts,
+  isLoading,
+  handleSearch,
+  loadMoreTrigger,
+  viewMode,
+  toggleViewMode,
+  localSearchQuery,
+  searchQuery
+} = useProductList();
 </script>
 
 
 <template>
-  <SearchBar @update:search="searchQuery = $event" />
+  <SearchBar
+      @update:localSearch="localSearchQuery = $event"
+      @update:search="searchQuery = $event; handleSearch()"
+  />
 
   <button @click="toggleViewMode" class="toggle-view-btn">
     {{ viewMode === 'grid' ? 'Список' : 'Сетка' }}
@@ -72,18 +47,6 @@ const toggleViewMode = () => {
 </template>
 
 <style scoped>
-.toggle-view-btn {
-  display: block;
-  margin-left: auto;
-  padding: 10px 15px;
-  font-size: 16px;
-  cursor: pointer;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-}
-
 .product-container.grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -103,7 +66,7 @@ const toggleViewMode = () => {
   justify-content: space-around;
   align-items: center;
   flex-direction: row-reverse;
-  gap: 20px;
+  padding: 0
 }
 
 
@@ -126,5 +89,32 @@ const toggleViewMode = () => {
   padding: 20px;
   font-size: 18px;
   color: #666;
+}
+
+.toggle-view-btn {
+  display: block;
+  margin-top: 10px;
+  margin-inline-start: auto;
+  padding: 10px 15px;
+  font-size: 16px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+@media (max-width: 1024px) {
+  .toggle-view-btn {
+    display: none;
+  }
+  .product-container.grid {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+    flex-direction: row-reverse;
+    padding: 0
+  }
 }
 </style>
